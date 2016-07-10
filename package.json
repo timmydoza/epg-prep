@@ -1,0 +1,23 @@
+{
+  "name": "epg-cli",
+  "version": "0.0.1",
+  "description": "Helper utility for express-photo-gallery",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "epg-prep": "bin/epg-prep"
+  },
+  "keywords": [],
+  "author": "Tim Mendoza <timmydoza@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "concurrent-transform": "^1.0.0",
+    "gulp": "^3.9.1",
+    "gulp-debug": "^2.1.2",
+    "gulp-image-resize": "^0.8.0",
+    "gulp-rename": "^1.2.2"
+  },
+  "devDependencies": {}
+}
