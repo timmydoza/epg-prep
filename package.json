@@ -1,6 +1,6 @@
 {
-  "name": "epg-cli",
-  "version": "0.0.1",
+  "name": "epg-prep",
+  "version": "0.0.2",
   "description": "Helper utility for express-photo-gallery",
   "main": "index.js",
   "scripts": {
