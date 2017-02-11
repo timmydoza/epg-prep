@@ -3,28 +3,58 @@ var gulp = require('gulp');
 var resize = require('gulp-image-resize');
 var parallel = require('concurrent-transform');
 var debug = require('gulp-debug');
+var del = require('del');
 var rename = require('gulp-rename');
 var CORES = require('os').cpus().length;
 var path = require('path');
 var photoLocation = path.resolve(process.argv[process.argv.length - 1]);
 console.log('Preparing: ' + photoLocation);
 
-gulp.task('previews', function() {
-  return gulp.src(photoLocation + '/*.jpg')
-    .pipe(parallel(resize({width:1500, quality: 0.5}), CORES))
-    //.pipe(rename(function(path) {path.basename += '_preview'}))
-    .pipe(gulp.dest(photoLocation + '/previews'))
-    .pipe(debug({title: 'Created'}));
+// Makes sure all the images have the .jpg extension. Does so by copying them
+// into a /tmp folder and changing the extension.
+gulp.task('canonicalize1', function() {
+  return gulp.src([photoLocation + '/*.jpg', photoLocation + '/*.JPG', photoLocation + '/*.jpeg', photoLocation + '/*.JPEG'])
+  .pipe(rename(function(path) {
+    path.extname = ".jpg"
+  }))
+  .pipe(gulp.dest(photoLocation + '/tmp'));
+});
+
+// Removes the original files from which the tmp files were copied.
+gulp.task('del-orig', ['canonicalize1'], function(){
+  return del([photoLocation + '/*.jpg', photoLocation + '/*.JPG', photoLocation + '/*.jpeg', photoLocation + '/*.JPEG'], {force: true});
+});
+
+// Copies back the newly created canocicalized files.
+gulp.task('copy-back', ['del-orig'], function(){
+  return gulp.src([photoLocation + '/tmp/*.jpg'])
+  .pipe(gulp.dest(photoLocation));
+})
+
+// Removes the tmp directory.
+gulp.task('cleanup', ['copy-back'], function(){
+  return del([photoLocation + '/tmp'], {force: true});
+});
+
+gulp.task('previews', ['canonicalize'], function() {
+  return gulp.src([photoLocation + '/*.jpg', photoLocation + '/*.JPG', photoLocation + '/*.jpeg', photoLocation + '/*.JPEG'])
+  .pipe(parallel(resize({width:1500, quality: 0.5}), CORES))
+  .pipe(rename(function(path) {
+    path.extname = ".jpg"
+  }))
+  .pipe(gulp.dest(photoLocation + '/previews'))
+  .pipe(debug({title: 'Created'}));
 });
 
 gulp.task('thumbnails', ['previews'], function() {
-  return gulp.src(photoLocation + '/previews/*.jpg')
-    .pipe(parallel(resize({width:200}), CORES))
-    //.pipe(rename(function(path) {path.basename += '_thumb'}))
-    .pipe(gulp.dest(photoLocation + '/thumbs'))
-    .pipe(debug({title: 'Created'}));
+  return gulp.src([photoLocation + '/previews/*.jpg', photoLocation + '/previews/*.JPG', photoLocation + '/previews/*.jpeg', photoLocation + '/previews/*.JPEG'])
+  .pipe(parallel(resize({width:200}), CORES))
+  //.pipe(rename(function(path) {path.basename += '_thumb'}))
+  .pipe(gulp.dest(photoLocation + '/thumbs'))
+  .pipe(debug({title: 'Created'}));
 });
 
-gulp.task('prep', ['previews', 'thumbnails']);
+gulp.task('canonicalize', ['canonicalize1', 'del-orig', 'copy-back', 'cleanup']);
+gulp.task('prep', ['canonicalize', 'previews', 'thumbnails']);
 
 gulp.start('prep');
