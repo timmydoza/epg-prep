@@ -7,7 +7,7 @@ var rename = require('gulp-rename');
 var CORES = require('os').cpus().length;
 var path = require('path');
 var photoLocation = process.argv.length > 2 ? path.resolve(process.argv[process.argv.length - 1]) : path.resolve('.');
-var extentionGlob = '/*.{png,gif,jpeg,jpg}';
+var extentionGlob = '/*.{png,gif,jpeg,jpg,bmp}';
 console.log('Preparing: ' + photoLocation);
 
 gulp.task('previews', function() {
