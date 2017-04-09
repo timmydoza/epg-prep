@@ -6,22 +6,27 @@ var debug = require('gulp-debug');
 var rename = require('gulp-rename');
 var CORES = require('os').cpus().length;
 var path = require('path');
-var photoLocation = path.resolve(process.argv[process.argv.length - 1]);
+var photoLocation = process.argv.length > 2 ? path.resolve(process.argv[process.argv.length - 1]) : path.resolve('.');
+var extentionGlob = '/*.{png,gif,jpeg,jpg}';
 console.log('Preparing: ' + photoLocation);
 
 gulp.task('previews', function() {
-  return gulp.src(photoLocation + '/*.jpg')
+  return gulp.src(photoLocation + extentionGlob, {nocase: true})
     .pipe(parallel(resize({width:1500, quality: 0.5}), CORES))
-    //.pipe(rename(function(path) {path.basename += '_preview'}))
-    .pipe(gulp.dest(photoLocation + '/previews'))
+    .pipe(rename(function(path) {
+      path.dirname = '';
+    }))
+    .pipe(gulp.dest('previews', {cwd: photoLocation}))
     .pipe(debug({title: 'Created'}));
 });
 
 gulp.task('thumbnails', ['previews'], function() {
-  return gulp.src(photoLocation + '/previews/*.jpg')
+  return gulp.src(photoLocation + '/previews' + extentionGlob, {nocase: true})
     .pipe(parallel(resize({width:200}), CORES))
-    //.pipe(rename(function(path) {path.basename += '_thumb'}))
-    .pipe(gulp.dest(photoLocation + '/thumbs'))
+    .pipe(rename(function(path) {
+      path.dirname = '';
+    }))
+    .pipe(gulp.dest('thumbs', {cwd: photoLocation}))
     .pipe(debug({title: 'Created'}));
 });
 
