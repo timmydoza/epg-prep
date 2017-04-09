@@ -7,27 +7,27 @@ var rename = require('gulp-rename');
 var CORES = require('os').cpus().length;
 var path = require('path');
 var photoLocation = process.argv.length > 2 ? path.resolve(process.argv[process.argv.length - 1]) : path.resolve('.');
-var extentionGlob = '/*.{png,gif,jpeg,jpg,bmp}';
+var extensionGlob = '/*.{png,gif,jpeg,jpg,bmp}';
 console.log('Preparing: ' + photoLocation);
 
 gulp.task('previews', function() {
-  return gulp.src(photoLocation + extentionGlob, {nocase: true})
+  return gulp.src(photoLocation + extensionGlob, {nocase: true})
     .pipe(parallel(resize({width:1500, quality: 0.5}), CORES))
     .pipe(rename(function(path) {
       path.dirname = '';
     }))
     .pipe(gulp.dest('previews', {cwd: photoLocation}))
-    .pipe(debug({title: 'Created'}));
+    .pipe(debug({title: 'Created preview image'}));
 });
 
 gulp.task('thumbnails', ['previews'], function() {
-  return gulp.src(photoLocation + '/previews' + extentionGlob, {nocase: true})
+  return gulp.src(photoLocation + '/previews' + extensionGlob, {nocase: true})
     .pipe(parallel(resize({width:200}), CORES))
     .pipe(rename(function(path) {
       path.dirname = '';
     }))
     .pipe(gulp.dest('thumbs', {cwd: photoLocation}))
-    .pipe(debug({title: 'Created'}));
+    .pipe(debug({title: 'Created thumbnail'}));
 });
 
 gulp.task('prep', ['previews', 'thumbnails']);

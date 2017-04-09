@@ -1,6 +1,6 @@
 {
   "name": "epg-prep",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Helper utility for express-photo-gallery",
   "main": "index.js",
   "scripts": {
